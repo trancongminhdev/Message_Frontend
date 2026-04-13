@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { ToastProvider } from "@/components/AppToast";
 import { LoadingProvider } from "@/components/LoadingScreen";
+import Providers from "./providers";
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
@@ -41,7 +42,9 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <ToastProvider>
           <LoadingProvider>
-            {children}
+            <Providers>
+              {children}
+            </Providers>
             {/* {process.env.NODE_ENV === 'production' && <Analytics />} */}
           </LoadingProvider>
         </ToastProvider>

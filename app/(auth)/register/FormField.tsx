@@ -1,8 +1,9 @@
 "use client";
-// import AppCheckBoxFormik from "@/component/CheckBox/AppCheckBoxFormik";
 import { useToast } from "@/components/AppToast";
 import AppButton from "@/components/button/AppButton";
 import AppInputFormik from "@/components/input/AppInputFormik";
+import { userService } from "@/service/user.service";
+import { useMutation } from "@tanstack/react-query";
 import { Form, Formik } from "formik";
 import { CgPassword } from "react-icons/cg";
 import { MdOutlineMail } from "react-icons/md";
@@ -10,24 +11,22 @@ import * as Yup from "yup";
 
 const FormField = () => {
   const toast = useToast();
-  // const { mutate, isPending } = useMutation({
-  //   mutationFn: userService.registerService,
-  //   onSuccess: () => {},
-  //   onError: (err) => {
-  //     toast.ERROR(err.message);
-  //   },
-  // });
+  const { mutate, isPending } = useMutation({
+    mutationFn: userService.register,
+    onSuccess: () => { },
+    onError: (err) => {
+      toast.ERROR(err.message);
+    },
+  });
 
   const inintValues = {
-    username: "",
+    userName: "",
     email: "",
     password: "",
-    provider: "normal",
-    isCheckBox: false,
   };
 
   const validationSchema = Yup.object({
-    username: Yup.string()
+    userName: Yup.string()
       .required("Không để trống ô nhập")
       .min(6, "Tên người dùng ít nhất 6 ký tự"),
     email: Yup.string()
@@ -35,11 +34,7 @@ const FormField = () => {
       .email("Email không hợp lệ"),
     password: Yup.string()
       .required("Không để trống ô nhập")
-      .min(6, "Mật khẩu ít nhất 6 ký tự"),
-    isCheckBox: Yup.boolean().oneOf(
-      [true],
-      "Vui lòng chấp nhận nhận diều khoản",
-    ),
+      .min(6, "Mật khẩu ít nhất 6 ký tự")
   });
 
   return (
@@ -47,19 +42,18 @@ const FormField = () => {
       initialValues={inintValues}
       validationSchema={validationSchema}
       onSubmit={(values, { resetForm }) => {
-        const { isCheckBox, ...body} = values;
-        // mutate(body, {
-        //   onSuccess: () => {
-        //     toast.SUCCESS("Tạo tài khoản thành công");
-        //     resetForm();
-        //   },
-        // });
+        mutate(values, {
+          onSuccess: () => {
+            toast.SUCCESS("Tạo tài khoản thành công");
+            resetForm();
+          },
+        });
       }}
     >
       {({ handleSubmit }) => (
         <Form className="space-y-2" onSubmit={handleSubmit}>
           <AppInputFormik
-            name="username"
+            name="userName"
             label="Tên người dùng"
             placeholder="Nhập tên của bạn"
             iconLeft={<MdOutlineMail className="text-colorGray" size={20} />}
@@ -81,18 +75,12 @@ const FormField = () => {
             type="password"
           />
 
-          {/* <AppCheckBoxFormik
-            name="isCheckBox"
-            label={{ children: "Tôi đồng ý điều khoản" }}
-            className="my-3"
-          /> */}
-
           <AppButton
-            // disabled={isPending}
-            // isLoading={isPending}
+            disabled={isPending}
+            isLoading={isPending}
             type="submit"
-            text={{ children: "Tạo tài khoản", className: "text-[18px]" }}
-            style={{ width: "100%" }}
+            text={{ children: "Tạo tài khoản", className: "text-[18px] text-white" }}
+            style={{ width: "100%", marginTop: 10 }}
           />
         </Form>
       )}

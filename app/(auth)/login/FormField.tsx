@@ -2,7 +2,7 @@
 import { useToast } from "@/components/AppToast";
 import AppButton from "@/components/button/AppButton";
 import AppInputFormik from "@/components/input/AppInputFormik";
-import { ROUTE } from "@/type/constant/route";
+import { ROUTE } from "@/types/constant/route";
 import { Form, Formik } from "formik";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -18,18 +18,21 @@ const FormField = () => {
 
   const handleSubmit = async (values: { email: string; password: string }) => {
     setLoading(true);
-    // const res = await signIn("credentials", {
-    //   email: values.email,
-    //   password: values.password,
-    //   redirect: false,
-    // });
+    const res = await signIn("credentials", {
+      email: values.email,
+      password: values.password,
+      redirect: false,
+    });
+
+    console.log('res', res);
+
 
     setLoading(false);
 
-    // if (res?.error) {
-    //   toast.ERROR("Sai email hoặc mật khẩu");
-    //   return;
-    // }
+    if (res?.error) {
+      toast.ERROR("Sai email hoặc mật khẩu");
+      return;
+    }
 
     router.push(ROUTE.HOME);
   };
@@ -40,12 +43,12 @@ const FormField = () => {
   };
 
   const validationSchema = Yup.object({
-    // email: Yup.string()
-    //   .required("Không để trống ô nhập")
-    //   .email("Email không hợp lệ"),
-    // password: Yup.string()
-    //   .required("Không để trống ô nhập")
-    //   .min(6, "Mật khẩu ít nhất 6 ký tự"),
+    email: Yup.string()
+      .required("Không để trống ô nhập")
+      .email("Email không hợp lệ"),
+    password: Yup.string()
+      .required("Không để trống ô nhập")
+      .min(6, "Mật khẩu ít nhất 6 ký tự"),
   });
 
   return (
@@ -53,8 +56,7 @@ const FormField = () => {
       initialValues={inintValues}
       validationSchema={validationSchema}
       onSubmit={(values) => {
-        // handleSubmit(values);
-        router.push(ROUTE.HOME);
+        handleSubmit(values);
       }}
     >
       {({ handleSubmit }) => (

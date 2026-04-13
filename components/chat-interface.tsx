@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Search, MoreVertical, Plus, Send, Phone, Video, ArrowLeft, MessageSquare, Users } from 'lucide-react';
-import UserList from './user-list';
+import { ArrowLeft, MoreVertical, Phone, Plus, Search, Send, Video } from 'lucide-react';
+import { useState } from 'react';
 import ChatArea from './chat-area';
+import UserList from './user-list';
 import UserOptionsMenu from './user-options-menu';
 
 export default function ChatInterface() {
@@ -83,7 +83,7 @@ export default function ChatInterface() {
         {/* Header */}
         <div className="p-4 border-b border-border">
           <h1 className="text-2xl font-bold text-foreground mb-4">Messages</h1>
-          
+
           {/* Search Bar */}
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -106,8 +106,8 @@ export default function ChatInterface() {
         </div>
 
         {/* User List */}
-        <UserList 
-          users={filteredUsers} 
+        <UserList
+          users={filteredUsers}
           selectedUser={selectedUser}
           onSelectUser={setSelectedUser}
         />
@@ -119,7 +119,7 @@ export default function ChatInterface() {
           {/* Chat Header */}
           <div className="bg-card border-b border-border p-4 flex items-center justify-between">
             <div className="flex items-center gap-3 flex-1">
-              <button 
+              <button
                 onClick={() => setSelectedUser(null)}
                 className="sm:hidden p-2 hover:bg-secondary rounded-lg transition text-foreground -ml-2"
               >
@@ -141,14 +141,14 @@ export default function ChatInterface() {
                 <Video className="w-5 h-5" />
               </button>
               <div className="relative">
-                <button 
+                <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="p-2 hover:bg-secondary rounded-lg transition text-foreground"
                 >
                   <MoreVertical className="w-5 h-5" />
                 </button>
                 {showUserMenu && (
-                  <UserOptionsMenu 
+                  <UserOptionsMenu
                     user={selectedUser}
                     onClose={() => setShowUserMenu(false)}
                   />

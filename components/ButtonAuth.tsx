@@ -1,7 +1,7 @@
 'use client'
 
 
-import { ROUTE } from "@/type/constant/route"
+import { ROUTE } from "@/types/constant/route"
 import { signIn } from "next-auth/react"
 import { FaFacebook } from "react-icons/fa6"
 import { FcGoogle } from "react-icons/fc"

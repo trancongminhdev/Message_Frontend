@@ -29,7 +29,7 @@ const AppButton: React.FC<IAppButtonProps> = ({
           buttonDefault
             ? "px-0 py-0 bg-transparent rounded-0"
             : "px-[50px] min-h-[55px] bg-blue-500 rounded-[10px]",
-          `disabled:bg-colorGrayLight disabled:text-colorGray`,
+          `disabled:bg-gray-300 disabled:text-gray-500`,
           props.className,
         )}
       >

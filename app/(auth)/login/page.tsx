@@ -2,7 +2,7 @@ import AppLine from "@/components/AppLine";
 import ButtonAuth from "@/components/ButtonAuth";
 import AppImage from "@/components/image/AppImage";
 import { IMAGE_SOUCE } from "@/public/assets/images";
-import { ROUTE } from "@/type/constant/route";
+import { ROUTE } from "@/types/constant/route";
 import FormField from "./FormField";
 import Link from "next/link";
 
