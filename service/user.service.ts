@@ -1,11 +1,21 @@
-import HttpClient from "./index.service";
-import { IRegisterUser } from "@/types/interaface/user.interface";
 import { URLS } from "@/service/urls.service";
+import { IResponseListData } from "@/types/interaface/api.interface";
+import { IRegisterUser, IUser } from "@/types/interaface/user.interface";
+import HttpClient from "./index.service";
 
-export class UserService {
+class UserService {
     async register(body: IRegisterUser) {
         try {
             const res = await HttpClient.post(URLS.REGISTER, body);
+            return res;
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getListUser(userName: string): Promise<IResponseListData<IUser>> {
+        try {
+            const res = await HttpClient.get<IResponseListData<IUser>>(URLS.GET_LIST_USER, { params: { userName } });
             return res;
         } catch (error) {
             throw error

@@ -1,4 +1,3 @@
-import { boolean, number } from "yup"
 
 export interface IUser {
     id: number;

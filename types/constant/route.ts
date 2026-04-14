@@ -1,5 +1,6 @@
 export const ROUTE = {
   HOME: "/",
   REGISTER: '/register',
-  LOGIN: '/login'
+  LOGIN: '/login',
+  MESSAGE: '/[id]'
 };
