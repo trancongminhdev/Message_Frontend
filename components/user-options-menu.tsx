@@ -1,9 +1,13 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { UserPlus, UserX, Search } from 'lucide-react';
+import React, { useState } from "react";
+import { UserPlus, UserX, Search } from "lucide-react";
+import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { ROUTE } from "@/types/constant/route";
 
 export default function UserOptionsMenu({ user, onClose }) {
+  const navigation = useRouter();
   const [isFriend, setIsFriend] = useState(user.isFriend);
 
   const handleAddFriend = () => {
@@ -27,7 +31,7 @@ export default function UserOptionsMenu({ user, onClose }) {
 
         {/* Add/Remove Friend */}
         {isFriend ? (
-          <button 
+          <button
             onClick={handleRemoveFriend}
             className="w-full px-4 py-2 text-left text-sm text-destructive hover:bg-secondary transition flex items-center gap-2 border-t border-border"
           >
@@ -35,7 +39,7 @@ export default function UserOptionsMenu({ user, onClose }) {
             Unfriend
           </button>
         ) : (
-          <button 
+          <button
             onClick={handleAddFriend}
             className="w-full px-4 py-2 text-left text-sm text-primary hover:bg-secondary transition flex items-center gap-2 border-t border-border"
           >
@@ -50,7 +54,13 @@ export default function UserOptionsMenu({ user, onClose }) {
         </button>
 
         {/* Block */}
-        <button className="w-full px-4 py-2 text-left text-sm text-destructive hover:bg-secondary transition border-t border-border">
+        <button
+          className="w-full px-4 py-2 text-left text-sm text-destructive hover:bg-secondary transition border-t border-border"
+          onClick={() => {
+            signOut();
+            navigation.push(ROUTE.LOGIN);
+          }}
+        >
           Block
         </button>
       </div>

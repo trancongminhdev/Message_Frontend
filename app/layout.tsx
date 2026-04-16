@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
-import "./globals.css";
 import { ToastProvider } from "@/components/AppToast";
 import { LoadingProvider } from "@/components/LoadingScreen";
+import { SocketProvider } from "@/config/socket/provider.socket";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
 import Providers from "./providers";
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -38,14 +38,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="mdl-js" suppressHydrationWarning>
       <body className="font-sans antialiased">
         <ToastProvider>
           <LoadingProvider>
             <Providers>
+              <SocketProvider />
               {children}
             </Providers>
-            {/* {process.env.NODE_ENV === 'production' && <Analytics />} */}
           </LoadingProvider>
         </ToastProvider>
       </body>

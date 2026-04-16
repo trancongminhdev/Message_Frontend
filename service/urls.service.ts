@@ -1,8 +1,15 @@
 export const URLS = {
-    // auth 
-    LOGIN: 'auth/login',
+  // auth
+  LOGIN: "auth/login",
 
-    // user
-    REGISTER: 'user/create-new-user',
-    GET_LIST_USER: 'user/get-list-user',
-}
+  // user
+  REGISTER: "user/create-new-user",
+  GET_LIST_USER: "user/get-list-user",
+  GET_USER_BY_ID: (id: number) => `user/get-user-by-id/${id}`,
+
+  //message
+  GET_LIST_MESSAGES: (id: number) => `message/get-list-messages/${id}`,
+
+  //conversation
+  GET_LIST_CONVERSATION: "conversation/get-list-conversation",
+};
