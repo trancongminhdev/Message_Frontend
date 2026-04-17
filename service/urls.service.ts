@@ -9,6 +9,7 @@ export const URLS = {
 
   //message
   GET_LIST_MESSAGES: (id: number) => `message/get-list-messages/${id}`,
+  UPDATE_STATUS_MESSAGE: (id: number) => `message/update-status-message/${id}`,
 
   //conversation
   GET_LIST_CONVERSATION: "conversation/get-list-conversation",

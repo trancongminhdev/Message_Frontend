@@ -5,9 +5,11 @@ import ModalSearchUser from "@/components/modal/ModalSearchUser";
 import UserList from "@/components/user-list";
 import { conversationService } from "@/service/convertasion.service";
 import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
 
 const LeftSidebar = () => {
+  const { data } = useSession();
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -42,7 +44,7 @@ const LeftSidebar = () => {
       </div>
 
       {/* User List */}
-      <UserList data={conversations?.data?.items || []} />
+      <UserList data={conversations?.data?.items || []} user={data?.user} />
     </div>
   );
 };
