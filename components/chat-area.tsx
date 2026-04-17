@@ -1,5 +1,6 @@
 "use client";
 
+import { formatGetTime } from "@/lib/formatDate/formatGetTIme";
 import { IMessage } from "@/types/interaface/message.interface";
 import { useSession } from "next-auth/react";
 
@@ -32,7 +33,7 @@ const ChatArea: React.FC<Props> = ({ messages }) => {
                   : "text-muted-foreground"
               }`}
             >
-              {item.updateAt}
+              {formatGetTime(item.createAt)}
             </span>
           </div>
         </div>

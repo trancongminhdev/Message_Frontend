@@ -22,31 +22,31 @@ import { notFound } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 interface Props {
-  idConversation: string;
+  ids: string[]; //[idUser, idConversation]
 }
 
-const ConversationUserChat: React.FC<Props> = ({ idConversation }) => {
+const ConversationUserChat: React.FC<Props> = ({ ids }) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [message, setMessage] = useState<IMessage[]>([]);
   const [inputMessage, setInputMessage] = useState<string>("");
 
   //lấy thông tin người nhận
   const { data: userReceiver, isLoading } = useQuery({
-    queryKey: ["user-receive", idConversation],
-    queryFn: () => userService.getUserById(Number(idConversation)),
-    enabled: !!idConversation,
+    queryKey: ["user-receive", ids[0]],
+    queryFn: () => userService.getUserById(Number(ids[0])),
+    enabled: !!ids[0],
   });
 
   //Lấy danh sách tin nhắn
   const { data: messages } = useQuery({
-    queryKey: ["messages", idConversation],
-    queryFn: () => messageService.getMessages(Number(idConversation)),
+    queryKey: ["messages", ids[1]],
+    queryFn: () => messageService.getMessages(Number(ids[1])),
   });
 
   const buttonSendMessage = useCallback(() => {
-    SendMessage({ idReceiver: Number(idConversation), message: inputMessage });
+    SendMessage({ idReceiver: Number(ids[0]), message: inputMessage });
     setInputMessage("");
-  }, [idConversation, inputMessage]);
+  }, [ids[0], inputMessage]);
 
   useEffect(() => {
     //set tin nhắn ban đầu
@@ -61,13 +61,18 @@ const ConversationUserChat: React.FC<Props> = ({ idConversation }) => {
       setMessage((prev) => [...prev, message]);
     });
 
-    JoinConversation(Number(idConversation));
+    JoinConversation(Number(ids[1]));
     return () => {
-      LeaveConversation(Number(idConversation));
+      LeaveConversation(Number(ids[1]));
     };
   }, []);
 
-  if (!isLoading && !userReceiver?.data) return notFound();
+  if (
+    !isLoading &&
+    !messages?.data?.items &&
+    messages?.data?.items?.length === 0
+  )
+    return notFound();
 
   return (
     <div className="flex h-screen bg-background flex-col sm:flex-row">

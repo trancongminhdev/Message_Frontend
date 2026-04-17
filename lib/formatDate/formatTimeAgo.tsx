@@ -1,4 +1,6 @@
-export default function formatTimeAgo(dateInput: Date | string): string {
+export default function formatTimeAgo(dateInput?: Date | string): string {
+  if (!dateInput) return "";
+
   const now = Date.now();
   const date = new Date(dateInput).getTime();
 
@@ -14,6 +16,10 @@ export default function formatTimeAgo(dateInput: Date | string): string {
   if (diffMs < dayMs) {
     const hours = Math.floor(diffMs / hourMs);
     const minutes = Math.floor((diffMs % hourMs) / minuteMs);
+
+    if (hours === 0 && minutes === 0) {
+      return `Vừa xong`;
+    }
 
     if (hours === 0) {
       return `${minutes} phút`; // < 1h

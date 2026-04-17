@@ -10,8 +10,6 @@ export const SendMessage = (data: { idReceiver: number; message: string }) => {
 
 export const ReceiveMessageUser = (callback: (message: IMessage) => void) => {
   const socket = getSocket();
-  console.log("socket id khi register:", socket?.id);
-  console.log("socket connected?", socket?.connected);
   socket?.on(SOCKET_EVENT.RECEIVE_MESSAGE_USER, (message: IMessage) => {
     callback(message);
   });

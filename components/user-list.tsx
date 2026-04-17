@@ -18,16 +18,16 @@ const UserList: React.FC<Props> = ({ data }) => {
       </p>
     );
   }
-  // const date = new Date(data[0].message.createAt);
-  // console.log(data[0].message.createAt);
-  // console.log(date.getDate(), date.getMonth() + 1, date.getFullYear());
 
-  // console.log(formatTimeAgo(data[0].message.createAt));
   return (
     <div className="flex-1 overflow-y-auto">
       {data.map((conversation) => (
         <Link
-          href={ROUTE.CONVERSATION(conversation.id.toString())}
+          key={conversation.id}
+          href={ROUTE.CONVERSATION(
+            conversation.user.id.toString(),
+            conversation.id.toString(),
+          )}
           className="w-full border-b transition text-left"
         >
           <div className="flex items-center p-4 hover:bg-gray-100 gap-3">
