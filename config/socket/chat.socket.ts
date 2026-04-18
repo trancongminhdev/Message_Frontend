@@ -19,9 +19,9 @@ export const ReceiveMessageConversation = (
   callback: (message: IMessage) => void,
 ) => {
   const socket = getSocket();
-  socket?.on(SOCKET_EVENT.RECEIVE_MESSAGE_CONVERSATION, (message: IMessage) => {
-    callback(message);
-  });
+  socket?.on(SOCKET_EVENT.RECEIVE_MESSAGE_CONVERSATION, (message: IMessage) =>
+    callback(message),
+  );
 };
 
 export const UpdateStatusMessage = (

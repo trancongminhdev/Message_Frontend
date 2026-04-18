@@ -1,29 +1,27 @@
-
 export interface IUser {
-    id: number;
-    avatar: string;
-    userName: string;
-    email: string;
-    isOneline: boolean;
-    lastOnline: string;
-    status: boolean;
-    createAt: string;
-    updateAt: string;
+  id: number;
+  avatar: string;
+  userName: string;
+  email: string;
+  isOnline: boolean;
+  lastOnline: string;
+  status: boolean;
+  createAt: string;
+  updateAt: string;
 }
 
 export interface IRegisterUser {
-    userName: string;
-    email: string;
-    password: string;
+  userName: string;
+  email: string;
+  password: string;
 }
 
 export interface ILoginUser {
-    userName: string;
-    password: string;
+  userName: string;
+  password: string;
 }
 
 export interface IResponseLogin {
-    user: IUser;
-    accessToken: string;
+  user: IUser;
+  accessToken: string;
 }
-

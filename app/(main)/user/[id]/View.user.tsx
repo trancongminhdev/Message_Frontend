@@ -18,6 +18,7 @@ import { IConversation } from "@/types/interaface/conversation.interface";
 import { IMessage } from "@/types/interaface/message.interface";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, MoreVertical, Phone, Send, Video } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { notFound, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -28,6 +29,7 @@ interface Props {
 
 const ViewUserChat: React.FC<Props> = ({ idReceiver }) => {
   const navigation = useRouter();
+  const { data } = useSession();
 
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [message, setMessage] = useState<IMessage[]>([]);
@@ -62,13 +64,9 @@ const ViewUserChat: React.FC<Props> = ({ idReceiver }) => {
     });
 
     RetryConversation((room: IConversation) => {
-      console.log("room", room);
       if (!room.id) return;
-      const route = ROUTE.CONVERSATION(room.id.toString());
+      const route = ROUTE.CONVERSATION(idReceiver, room.id.toString());
       navigation.push(route);
-
-      LeaveConversation(Number(idReceiver));
-      JoinConversation(Number(room.id));
     });
 
     JoinConversation(Number(idReceiver));
@@ -132,7 +130,7 @@ const ViewUserChat: React.FC<Props> = ({ idReceiver }) => {
         </div>
 
         {/* Messages */}
-        <ChatArea messages={message} />
+        <ChatArea messages={message} user={data?.user} />
 
         {/* Input Area */}
         <div className="bg-card border-t border-border p-4">

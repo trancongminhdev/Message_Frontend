@@ -58,7 +58,7 @@ const UserList: React.FC<Props> = ({ params, data, user, onUpdateStatus }) => {
                   className="rounded-full"
                   alt={conversation.user.userName}
                 />
-                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card"></div>
+                {/* <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card"></div> */}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">

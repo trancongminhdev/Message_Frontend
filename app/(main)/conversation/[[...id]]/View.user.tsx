@@ -10,13 +10,15 @@ import {
   JoinConversation,
   LeaveConversation,
 } from "@/config/socket/conversation.socket";
-import { getSocket } from "@/config/socket/socket";
+import { getSocket, SocketOff } from "@/config/socket/socket";
+import { SOCKET_EVENT } from "@/config/socket/type.socket";
 import { IMAGE_SOUCE } from "@/public/assets/images";
 import { messageService } from "@/service/message.service";
 import { userService } from "@/service/user.service";
 import { IMessage } from "@/types/interaface/message.interface";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, MoreVertical, Phone, Send, Video } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -26,6 +28,8 @@ interface Props {
 }
 
 const ConversationUserChat: React.FC<Props> = ({ ids }) => {
+  const { data } = useSession();
+
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [message, setMessage] = useState<IMessage[]>([]);
   const [inputMessage, setInputMessage] = useState<string>("");
@@ -54,15 +58,14 @@ const ConversationUserChat: React.FC<Props> = ({ ids }) => {
   }, [messages]);
 
   useEffect(() => {
-    const socket = getSocket();
-    if (!socket) return;
-
     ReceiveMessageConversation((message: IMessage) => {
       setMessage((prev) => [...prev, message]);
     });
 
     JoinConversation(Number(ids[1]));
     return () => {
+      SocketOff(SOCKET_EVENT.RECEIVE_MESSAGE_USER);
+      SocketOff(SOCKET_EVENT.RETRY_CONVERSATION);
       LeaveConversation(Number(ids[1]));
     };
   }, []);
@@ -98,7 +101,9 @@ const ConversationUserChat: React.FC<Props> = ({ ids }) => {
                 {userReceiver?.data?.userName}
               </h2>
               <p className="text-sm text-muted-foreground">
-                {userReceiver?.data?.isOneline && "Đang hoạt động"}
+                {userReceiver?.data?.isOnline
+                  ? "Đang hoạt động"
+                  : "Không hoạt động"}
               </p>
             </div>
           </div>
@@ -127,7 +132,7 @@ const ConversationUserChat: React.FC<Props> = ({ ids }) => {
         </div>
 
         {/* Messages */}
-        <ChatArea messages={message} />
+        <ChatArea messages={message} user={data?.user} />
 
         {/* Input Area */}
         <div className="bg-card border-t border-border p-4">
