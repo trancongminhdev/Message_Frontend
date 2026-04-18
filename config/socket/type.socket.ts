@@ -8,4 +8,6 @@ export const SOCKET_EVENT = {
   JOIN_CONVERSATION: "join_conversation",
   LEAVE_CONVERSATION: "leave_conversation",
   RETRY_CONVERSATION: "retry_conversation",
+  ONLINE: "online",
+  OFFLINE: "offline",
 };

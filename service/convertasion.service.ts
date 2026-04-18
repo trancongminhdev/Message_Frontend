@@ -14,6 +14,18 @@ class ConvertasionService {
       throw err;
     }
   }
+
+  async getListUserConversation(userName: string) {
+    try {
+      const res = await HttpClient.get<IResponseListData<any>>(
+        URLS.GET_LIST_USER_CONVERSATION,
+        { params: { userName } },
+      );
+      return res;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export const conversationService = new ConvertasionService();

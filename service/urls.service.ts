@@ -13,4 +13,5 @@ export const URLS = {
 
   //conversation
   GET_LIST_CONVERSATION: "conversation/get-list-conversation",
+  GET_LIST_USER_CONVERSATION: "conversation/get-list-user-conversation",
 };

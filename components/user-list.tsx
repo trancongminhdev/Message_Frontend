@@ -1,24 +1,22 @@
 "use client";
 
+import formatTimeAgo from "@/lib/formatDate/formatTimeAgo";
+import { cn } from "@/lib/utils";
 import { ROUTE } from "@/types/constant/route";
 import { IConversation } from "@/types/interaface/conversation.interface";
-import Link from "next/link";
-import AppImage from "./image/AppImage";
-import formatTimeAgo from "@/lib/formatDate/formatTimeAgo";
 import { IUser } from "@/types/interaface/user.interface";
-import { cn } from "@/lib/utils";
-import { useMutation } from "@tanstack/react-query";
-import { messageService } from "@/service/message.service";
+import Link from "next/link";
 import { useState } from "react";
-import { useParams } from "next/navigation";
-import { useSession } from "next-auth/react";
+import AppImage from "./image/AppImage";
 
 interface Props {
+  params: { id: string[] };
   data: IConversation[];
   user: IUser;
+  onUpdateStatus: (idMessage: number) => void;
 }
 
-const UserList: React.FC<Props> = ({ data, user }) => {
+const UserList: React.FC<Props> = ({ params, data, user, onUpdateStatus }) => {
   if (data.length === 0) {
     return (
       <p className="text-center text-muted-foreground h-screen w-full flex justify-center items-center">
@@ -27,23 +25,13 @@ const UserList: React.FC<Props> = ({ data, user }) => {
     );
   }
 
-  const { data: session } = useSession();
-  const params = useParams() as { id: string[] };
-  const idConversation = params.id[1];
-
-  const { mutate } = useMutation({
-    mutationFn: messageService.updateStatusMessage,
-  });
-
-  const handleUpdateStatus = (idMessage: number) => {
-    mutate({ id: idMessage, status: "SEEN" });
-  };
+  const idConversation = params.id ? params.id[1] : "0";
 
   return (
     <div className="flex-1 overflow-y-auto">
       {data.map((conversation) => {
         const [isSeenTemp, setIsSeenTemp] = useState<boolean>(true);
-        const isSeen = conversation.message.status === "SENT";
+        const isSeen = conversation.message?.status === "SENT";
         return (
           <Link
             key={conversation.id}
@@ -53,7 +41,7 @@ const UserList: React.FC<Props> = ({ data, user }) => {
             )}
             className="w-full border-b transition text-left"
             onClick={() => {
-              handleUpdateStatus(conversation.message.id);
+              onUpdateStatus(conversation.message.id);
               setIsSeenTemp(false);
             }}
           >
@@ -88,7 +76,7 @@ const UserList: React.FC<Props> = ({ data, user }) => {
                       isSeen && "font-medium",
                     )}
                   >
-                    {session?.user.id === conversation.user.id && "Đã gửi: "}
+                    {user.id === conversation.user.id && "Đã gửi: "}
                     {conversation.message.message}
                   </p>
                   {isSeenTemp && isSeen && (

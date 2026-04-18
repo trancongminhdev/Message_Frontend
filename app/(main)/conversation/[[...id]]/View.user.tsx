@@ -97,7 +97,9 @@ const ConversationUserChat: React.FC<Props> = ({ ids }) => {
               <h2 className="font-semibold text-foreground truncate">
                 {userReceiver?.data?.userName}
               </h2>
-              <p className="text-sm text-muted-foreground">Active now</p>
+              <p className="text-sm text-muted-foreground">
+                {userReceiver?.data?.isOneline && "Đang hoạt động"}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
