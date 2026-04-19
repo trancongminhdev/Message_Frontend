@@ -59,17 +59,23 @@ const ViewUserChat: React.FC<Props> = ({ idReceiver }) => {
   }, [messages]);
 
   useEffect(() => {
-    ReceiveMessageUser((message: IMessage) => {
-      setMessage((prev) => [...prev, message]);
+    const socket = getSocket();
+    socket.on(SOCKET_EVENT.CONNECT, () => {
+      ReceiveMessageUser((message: IMessage) => {
+        setMessage((prev) => [...prev, message]);
+      });
     });
 
-    RetryConversation((room: IConversation) => {
-      if (!room.id) return;
-      const route = ROUTE.CONVERSATION(idReceiver, room.id.toString());
-      navigation.push(route);
+    socket.on(SOCKET_EVENT.CONNECT, () => {
+      RetryConversation((room: IConversation) => {
+        if (!room.id) return;
+        const route = ROUTE.CONVERSATION(idReceiver, room.id.toString());
+        navigation.push(route);
 
-      LeaveConversation(Number(idReceiver));
-      JoinConversation(Number(room.id));
+        LeaveConversation(Number(idReceiver));
+        JoinConversation(Number(room.id));
+      });
+      JoinConversation(Number(idReceiver));
     });
 
     JoinConversation(Number(idReceiver));

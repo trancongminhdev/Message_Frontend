@@ -2,10 +2,7 @@
 
 import ChatArea from "@/components/chat-area";
 import UserOptionsMenu from "@/components/user-options-menu";
-import {
-  ReceiveMessageConversation,
-  SendMessage,
-} from "@/config/socket/chat.socket";
+import { SendMessage } from "@/config/socket/chat.socket";
 import {
   JoinConversation,
   LeaveConversation,
@@ -16,8 +13,10 @@ import { IMAGE_SOUCE } from "@/public/assets/images";
 import { conversationService } from "@/service/convertasion.service";
 import { messageService } from "@/service/message.service";
 import { userService } from "@/service/user.service";
+import { IResponseListData } from "@/types/interaface/api.interface";
+import { IConversation } from "@/types/interaface/conversation.interface";
 import { IMessage } from "@/types/interaface/message.interface";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, MoreVertical, Phone, Send, Video } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -30,7 +29,7 @@ interface Props {
 
 const ConversationUserChat: React.FC<Props> = ({ ids }) => {
   const { data } = useSession();
-
+  const queryClient = useQueryClient();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [message, setMessage] = useState<IMessage[]>([]);
   const [inputMessage, setInputMessage] = useState<string>("");
@@ -75,6 +74,27 @@ const ConversationUserChat: React.FC<Props> = ({ ids }) => {
       SOCKET_EVENT.RECEIVE_MESSAGE_CONVERSATION,
       (message: IMessage) => {
         setMessage((prev) => [...prev, message]);
+        queryClient.setQueryData(
+          ["conversations"],
+          (oldData: IResponseListData<IConversation>) => {
+            if (!oldData.data?.items) return oldData;
+            return {
+              ...oldData,
+              data: {
+                ...oldData.data,
+                items: oldData.data.items.map((item) => {
+                  if (item.id === message.idConversation) {
+                    return {
+                      ...item,
+                      message: message,
+                    };
+                  }
+                  return item;
+                }),
+              },
+            };
+          },
+        );
       },
     );
 
@@ -91,7 +111,7 @@ const ConversationUserChat: React.FC<Props> = ({ ids }) => {
     };
   }, [ids[1]]);
 
-  if (isLoadingConversation) return null;
+  if (isLoadingConversation) return <p>Loading...</p>;
   if (!conversation) return notFound();
 
   if (

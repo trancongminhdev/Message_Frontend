@@ -18,15 +18,18 @@ const LeftSidebar = () => {
   const { data: session } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
 
+  //list user khi search
   const { data: users, isLoading: isLoadingUsers } = useQuery({
     queryKey: ["list-user-search", searchQuery],
     queryFn: () => conversationService.getListUserConversation(searchQuery),
     enabled: !!searchQuery,
   });
 
+  //list conversation
   const { data: conversations, isLoading: isLoadingConversations } = useQuery({
     queryKey: ["conversations"],
     queryFn: () => conversationService.getListConversation(),
+    enabled: !!session?.user?.id && !searchQuery,
   });
 
   const { mutate } = useMutation({

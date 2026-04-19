@@ -2,7 +2,7 @@ import { StatusMessage } from "../constant/message.constant";
 
 export interface IMessage {
   id: number;
-  idRoom: number;
+  idConversation: number;
   userSend: number;
   message: string;
   status?: StatusMessage;
