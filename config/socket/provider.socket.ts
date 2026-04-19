@@ -1,7 +1,7 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
-import { initSocket } from "./socket";
+import { disconnectSocket, initSocket } from "./socket";
 import { SOCKET_EVENT } from "./type.socket";
 
 export const SocketProvider = () => {
@@ -17,8 +17,7 @@ export const SocketProvider = () => {
       console.log(SOCKET_EVENT.CONNECT, socket.id);
     });
     return () => {
-      // socket.off();
-      // disconnectSocket();
+      disconnectSocket();
     };
   }, [data]);
 

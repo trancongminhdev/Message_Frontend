@@ -10,3 +10,7 @@ export interface IConversation {
   message: IMessage;
   user: IUser;
 }
+
+export interface IBodyCheckConversation {
+  idConversation: number;
+}

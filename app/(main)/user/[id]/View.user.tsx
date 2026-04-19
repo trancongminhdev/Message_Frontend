@@ -67,6 +67,9 @@ const ViewUserChat: React.FC<Props> = ({ idReceiver }) => {
       if (!room.id) return;
       const route = ROUTE.CONVERSATION(idReceiver, room.id.toString());
       navigation.push(route);
+
+      LeaveConversation(Number(idReceiver));
+      JoinConversation(Number(room.id));
     });
 
     JoinConversation(Number(idReceiver));

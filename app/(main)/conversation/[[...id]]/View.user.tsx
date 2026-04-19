@@ -13,6 +13,7 @@ import {
 import { getSocket, SocketOff } from "@/config/socket/socket";
 import { SOCKET_EVENT } from "@/config/socket/type.socket";
 import { IMAGE_SOUCE } from "@/public/assets/images";
+import { conversationService } from "@/service/convertasion.service";
 import { messageService } from "@/service/message.service";
 import { userService } from "@/service/user.service";
 import { IMessage } from "@/types/interaface/message.interface";
@@ -34,23 +35,34 @@ const ConversationUserChat: React.FC<Props> = ({ ids }) => {
   const [message, setMessage] = useState<IMessage[]>([]);
   const [inputMessage, setInputMessage] = useState<string>("");
 
+  //check conversation
+  const { data: conversation, isLoading: isLoadingConversation } = useQuery({
+    queryKey: ["check-conversation", ids[1]],
+    queryFn: () =>
+      conversationService.checkConversation({
+        idConversation: Number(ids[1]),
+      }),
+    enabled: !!ids[1],
+  });
+
   //lấy thông tin người nhận
   const { data: userReceiver, isLoading } = useQuery({
     queryKey: ["user-receive", ids[0]],
     queryFn: () => userService.getUserById(Number(ids[0])),
-    enabled: !!ids[0],
+    enabled: !!ids[0] && !!conversation,
   });
 
   //Lấy danh sách tin nhắn
   const { data: messages } = useQuery({
     queryKey: ["messages", ids[1]],
     queryFn: () => messageService.getMessages(Number(ids[1])),
+    enabled: !!ids[1] && !!conversation,
   });
 
-  const buttonSendMessage = useCallback(() => {
-    SendMessage({ idReceiver: Number(ids[0]), message: inputMessage });
+  const buttonSendMessage = useCallback((message: string) => {
+    SendMessage({ idReceiver: Number(ids[0]), message });
     setInputMessage("");
-  }, [ids[0], inputMessage]);
+  }, []);
 
   useEffect(() => {
     //set tin nhắn ban đầu
@@ -58,17 +70,29 @@ const ConversationUserChat: React.FC<Props> = ({ ids }) => {
   }, [messages]);
 
   useEffect(() => {
-    ReceiveMessageConversation((message: IMessage) => {
-      setMessage((prev) => [...prev, message]);
+    const socket = getSocket();
+    socket.on(
+      SOCKET_EVENT.RECEIVE_MESSAGE_CONVERSATION,
+      (message: IMessage) => {
+        setMessage((prev) => [...prev, message]);
+      },
+    );
+
+    socket.on(SOCKET_EVENT.CONNECT, () => {
+      JoinConversation(Number(ids[1]));
     });
 
     JoinConversation(Number(ids[1]));
+
     return () => {
-      SocketOff(SOCKET_EVENT.RECEIVE_MESSAGE_USER);
-      SocketOff(SOCKET_EVENT.RETRY_CONVERSATION);
+      SocketOff(SOCKET_EVENT.CONNECT);
+      SocketOff(SOCKET_EVENT.RECEIVE_MESSAGE_CONVERSATION);
       LeaveConversation(Number(ids[1]));
     };
-  }, []);
+  }, [ids[1]]);
+
+  if (isLoadingConversation) return null;
+  if (!conversation) return notFound();
 
   if (
     !isLoading &&
@@ -147,7 +171,7 @@ const ConversationUserChat: React.FC<Props> = ({ ids }) => {
             <button
               className="p-2 bg-primary text-primary-foreground rounded-full hover:opacity-90 transition cursor-pointer"
               onClick={() => {
-                buttonSendMessage();
+                buttonSendMessage(inputMessage);
               }}
             >
               <Send className="w-5 h-5" />

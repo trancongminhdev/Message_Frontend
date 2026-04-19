@@ -32,6 +32,9 @@ const UserList: React.FC<Props> = ({ params, data, user, onUpdateStatus }) => {
       {data.map((conversation) => {
         const [isSeenTemp, setIsSeenTemp] = useState<boolean>(true);
         const isSeen = conversation.message?.status === "SENT";
+
+        const idSender = user.id === conversation.message.userSend;
+
         return (
           <Link
             key={conversation.id}
@@ -41,8 +44,8 @@ const UserList: React.FC<Props> = ({ params, data, user, onUpdateStatus }) => {
             )}
             className="w-full border-b transition text-left"
             onClick={() => {
-              onUpdateStatus(conversation.message.id);
-              setIsSeenTemp(false);
+              !idSender && onUpdateStatus(conversation.message.id);
+              !idSender && setIsSeenTemp(false);
             }}
           >
             <div
@@ -76,10 +79,10 @@ const UserList: React.FC<Props> = ({ params, data, user, onUpdateStatus }) => {
                       isSeen && "font-medium",
                     )}
                   >
-                    {user.id === conversation.user.id && "Đã gửi: "}
+                    {idSender && "Đã gửi: "}
                     {conversation.message.message}
                   </p>
-                  {isSeenTemp && isSeen && (
+                  {!idSender && isSeenTemp && isSeen && (
                     <div className="w-2 h-2 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-semibold shrink-0" />
                   )}
                 </div>

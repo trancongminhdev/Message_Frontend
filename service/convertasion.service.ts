@@ -1,7 +1,10 @@
-import { IResponseListData } from "@/types/interaface/api.interface";
+import { IResponse, IResponseListData } from "@/types/interaface/api.interface";
 import HttpClient from "./index.service";
 import { URLS } from "./urls.service";
-import { IConversation } from "@/types/interaface/conversation.interface";
+import {
+  IBodyCheckConversation,
+  IConversation,
+} from "@/types/interaface/conversation.interface";
 
 class ConvertasionService {
   async getListConversation(): Promise<IResponseListData<IConversation>> {
@@ -21,6 +24,20 @@ class ConvertasionService {
         URLS.GET_LIST_USER_CONVERSATION,
         { params: { userName } },
       );
+      return res;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async checkConversation(
+    body: IBodyCheckConversation,
+  ): Promise<IResponse<IConversation>> {
+    try {
+      const res = await HttpClient.post<
+        IBodyCheckConversation,
+        IResponse<IConversation>
+      >(URLS.CHECK_CONVERSATION, body);
       return res;
     } catch (error) {
       throw error;
