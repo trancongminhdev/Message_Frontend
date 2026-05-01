@@ -4,30 +4,37 @@ import AppImage from "@/components/image/AppImage";
 import InputSearch from "@/components/input/InputSearch";
 import ModalSearchUser from "@/components/modal/ModalSearchUser";
 import UserList from "@/components/user-list";
+import { AddNewConversation, UpdateConversation } from "@/config/socket/conversation.socket";
+import { getSocket, SocketOff } from "@/config/socket/socket";
+import { SOCKET_EVENT } from "@/config/socket/type.socket";
 import { IMAGE_SOUCE } from "@/public/assets/images";
 import { conversationService } from "@/service/convertasion.service";
 import { messageService } from "@/service/message.service";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import QUERY_KEY from "@/types/constant/queryKey.constant";
+import { ROUTE } from "@/types/constant/route";
+import { IConversation } from "@/types/interaface/conversation.interface";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const LeftSidebar = () => {
   const params = useParams() as { id: string[] };
 
   const { data: session } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
+  const queryClient = useQueryClient();
 
   //list user khi search
   const { data: users, isLoading: isLoadingUsers } = useQuery({
-    queryKey: ["list-user-search", searchQuery],
+    queryKey: [QUERY_KEY.LIST_SEARCH_USER, searchQuery],
     queryFn: () => conversationService.getListUserConversation(searchQuery),
     enabled: !!searchQuery,
   });
 
   //list conversation
   const { data: conversations, isLoading: isLoadingConversations } = useQuery({
-    queryKey: ["conversations"],
+    queryKey: [QUERY_KEY.LIST_CONVERSATIONS],
     queryFn: () => conversationService.getListConversation(),
     enabled: !!session?.user?.id && !searchQuery,
   });
@@ -41,6 +48,25 @@ const LeftSidebar = () => {
       ? users?.data?.items
       : conversations?.data?.items;
   }, [searchQuery, users, conversations]);
+
+  useEffect(() => {
+    const socket = getSocket();
+
+    socket.on(SOCKET_EVENT.CONNECT, () => {
+      AddNewConversation(queryClient);
+    });
+
+    socket.on(SOCKET_EVENT.CONNECT, () => {
+      console.log("UpdateConversation");
+      
+      UpdateConversation(queryClient);
+    });
+    
+    return () => {
+      SocketOff(SOCKET_EVENT.ADD_NEW_CONVERSATION);
+      SocketOff(SOCKET_EVENT.UPDATE_CONVERSATION);
+    };
+  }, []);
 
   return (
     <div

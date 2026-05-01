@@ -6,6 +6,7 @@ import { SendMessage } from "@/config/socket/chat.socket";
 import {
   JoinConversation,
   LeaveConversation,
+  UpdateConversation,
 } from "@/config/socket/conversation.socket";
 import { getSocket, SocketOff } from "@/config/socket/socket";
 import { SOCKET_EVENT } from "@/config/socket/type.socket";
@@ -13,8 +14,7 @@ import { IMAGE_SOUCE } from "@/public/assets/images";
 import { conversationService } from "@/service/convertasion.service";
 import { messageService } from "@/service/message.service";
 import { userService } from "@/service/user.service";
-import { IResponseListData } from "@/types/interaface/api.interface";
-import { IConversation } from "@/types/interaface/conversation.interface";
+import QUERY_KEY from "@/types/constant/queryKey.constant";
 import { IMessage } from "@/types/interaface/message.interface";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, MoreVertical, Phone, Send, Video } from "lucide-react";
@@ -36,7 +36,7 @@ const ConversationUserChat: React.FC<Props> = ({ ids }) => {
 
   //check conversation
   const { data: conversation, isLoading: isLoadingConversation } = useQuery({
-    queryKey: ["check-conversation", ids[1]],
+    queryKey: [QUERY_KEY.CHECK_CONVERSATION, ids[1]],
     queryFn: () =>
       conversationService.checkConversation({
         idConversation: Number(ids[1]),
@@ -46,14 +46,14 @@ const ConversationUserChat: React.FC<Props> = ({ ids }) => {
 
   //lấy thông tin người nhận
   const { data: userReceiver, isLoading } = useQuery({
-    queryKey: ["user-receive", ids[0]],
+    queryKey: [QUERY_KEY.USER_RECEIVE, ids[0]],
     queryFn: () => userService.getUserById(Number(ids[0])),
     enabled: !!ids[0] && !!conversation,
   });
 
   //Lấy danh sách tin nhắn
   const { data: messages } = useQuery({
-    queryKey: ["messages", ids[1]],
+    queryKey: [QUERY_KEY.LIST_MESSAGES, ids[1]],
     queryFn: () => messageService.getMessages(Number(ids[1])),
     enabled: !!ids[1] && !!conversation,
   });
@@ -70,33 +70,17 @@ const ConversationUserChat: React.FC<Props> = ({ ids }) => {
 
   useEffect(() => {
     const socket = getSocket();
+
     socket.on(
       SOCKET_EVENT.RECEIVE_MESSAGE_CONVERSATION,
       (message: IMessage) => {
         setMessage((prev) => [...prev, message]);
-        queryClient.setQueryData(
-          ["conversations"],
-          (oldData: IResponseListData<IConversation>) => {
-            if (!oldData.data?.items) return oldData;
-            return {
-              ...oldData,
-              data: {
-                ...oldData.data,
-                items: oldData.data.items.map((item) => {
-                  if (item.id === message.idConversation) {
-                    return {
-                      ...item,
-                      message: message,
-                    };
-                  }
-                  return item;
-                }),
-              },
-            };
-          },
-        );
       },
     );
+
+    socket.on(SOCKET_EVENT.CONNECT, () => {
+      UpdateConversation(queryClient);
+    });
 
     socket.on(SOCKET_EVENT.CONNECT, () => {
       JoinConversation(Number(ids[1]));

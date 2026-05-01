@@ -8,13 +8,14 @@ import { useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import InputSearch from "../input/InputSearch";
 import ItemUserSearch from "../user/ItemUserSearch";
+import QUERY_KEY from "@/types/constant/queryKey.constant";
 
 const ModalSearchUser = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState<string>("");
 
   const { data, isLoading } = useQuery({
-    queryKey: ["search-user", search],
+    queryKey: [QUERY_KEY.LIST_SEARCH_USER, search],
     queryFn: () => userService.getListUser(search),
     enabled: !!search,
   });
@@ -50,9 +51,11 @@ const ModalSearchUser = () => {
               height={30}
             />
           ) : data?.data?.items && data?.data?.items.length > 0 ? (
-            data?.data?.items?.map((user) => (
-              <ItemUserSearch key={user.id} {...user} />
-            ))
+            <div className="flex flex-col gap-2 mt-2 w-full">
+              {data?.data?.items?.map((user) => (
+                <ItemUserSearch key={user.id} {...user} />
+              ))}
+            </div>
           ) : (
             <p className="w-full text-center text-sm text-muted-foreground">
               Không có người dùng

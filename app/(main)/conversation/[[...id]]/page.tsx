@@ -1,4 +1,4 @@
-import ConversationUserChat from "./View.user";
+import ConversationUserChat from "./View.conversation";
 
 const ConversationPage = async ({ params }: { params: { id: string[] } }) => {
   const { id } = await params;

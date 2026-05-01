@@ -3,20 +3,16 @@
 import ChatArea from "@/components/chat-area";
 import UserOptionsMenu from "@/components/user-options-menu";
 import { ReceiveMessageUser, SendMessage } from "@/config/socket/chat.socket";
-import {
-  JoinConversation,
-  LeaveConversation,
-  RetryConversation,
-} from "@/config/socket/conversation.socket";
+import { AddNewConversation } from "@/config/socket/conversation.socket";
 import { getSocket, SocketOff } from "@/config/socket/socket";
 import { SOCKET_EVENT } from "@/config/socket/type.socket";
 import { IMAGE_SOUCE } from "@/public/assets/images";
-import { messageService } from "@/service/message.service";
 import { userService } from "@/service/user.service";
+import QUERY_KEY from "@/types/constant/queryKey.constant";
 import { ROUTE } from "@/types/constant/route";
 import { IConversation } from "@/types/interaface/conversation.interface";
 import { IMessage } from "@/types/interaface/message.interface";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, MoreVertical, Phone, Send, Video } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -30,6 +26,7 @@ interface Props {
 const ViewUserChat: React.FC<Props> = ({ idReceiver }) => {
   const navigation = useRouter();
   const { data } = useSession();
+  const queryClient = useQueryClient();
 
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [message, setMessage] = useState<IMessage[]>([]);
@@ -37,15 +34,9 @@ const ViewUserChat: React.FC<Props> = ({ idReceiver }) => {
 
   //lấy thông tin người nhận
   const { data: userReceiver, isLoading } = useQuery({
-    queryKey: ["user-receive", idReceiver],
+    queryKey: [QUERY_KEY.USER_RECEIVE, idReceiver],
     queryFn: () => userService.getUserById(Number(idReceiver)),
     enabled: !!idReceiver,
-  });
-
-  //Lấy danh sách tin nhắn
-  const { data: messages } = useQuery({
-    queryKey: ["messages", idReceiver],
-    queryFn: () => messageService.getMessages(Number(idReceiver)),
   });
 
   const buttonSendMessage = useCallback(() => {
@@ -54,12 +45,8 @@ const ViewUserChat: React.FC<Props> = ({ idReceiver }) => {
   }, [idReceiver, inputMessage]);
 
   useEffect(() => {
-    //set tin nhắn ban đầu
-    setMessage(messages?.data?.items || []);
-  }, [messages]);
-
-  useEffect(() => {
     const socket = getSocket();
+
     socket.on(SOCKET_EVENT.CONNECT, () => {
       ReceiveMessageUser((message: IMessage) => {
         setMessage((prev) => [...prev, message]);
@@ -67,22 +54,17 @@ const ViewUserChat: React.FC<Props> = ({ idReceiver }) => {
     });
 
     socket.on(SOCKET_EVENT.CONNECT, () => {
-      RetryConversation((room: IConversation) => {
-        if (!room.id) return;
-        const route = ROUTE.CONVERSATION(idReceiver, room.id.toString());
+      AddNewConversation(queryClient, (coversation: IConversation) => {
+        if (!coversation.id) return;
+        const route = ROUTE.CONVERSATION(idReceiver, coversation.id.toString());
         navigation.push(route);
-
-        LeaveConversation(Number(idReceiver));
-        JoinConversation(Number(room.id));
       });
-      JoinConversation(Number(idReceiver));
     });
 
-    JoinConversation(Number(idReceiver));
     return () => {
       SocketOff(SOCKET_EVENT.RECEIVE_MESSAGE_USER);
-      SocketOff(SOCKET_EVENT.RETRY_CONVERSATION);
-      LeaveConversation(Number(idReceiver));
+      SocketOff(SOCKET_EVENT.ADD_NEW_CONVERSATION);
+      SocketOff(SOCKET_EVENT.UPDATE_CONVERSATION);
     };
   }, []);
 

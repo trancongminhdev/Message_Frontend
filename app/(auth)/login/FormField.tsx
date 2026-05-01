@@ -4,7 +4,7 @@ import AppButton from "@/components/button/AppButton";
 import AppInputFormik from "@/components/input/AppInputFormik";
 import { ROUTE } from "@/types/constant/route";
 import { Form, Formik } from "formik";
-import { signIn } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CgPassword } from "react-icons/cg";
@@ -23,9 +23,6 @@ const FormField = () => {
       password: values.password,
       redirect: false,
     });
-
-    console.log('res', res);
-
 
     setLoading(false);
 
@@ -57,6 +54,7 @@ const FormField = () => {
       validationSchema={validationSchema}
       onSubmit={(values) => {
         handleSubmit(values);
+        // signOut()
       }}
     >
       {({ handleSubmit }) => (

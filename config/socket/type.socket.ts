@@ -5,9 +5,10 @@ export const SOCKET_EVENT = {
   RECEIVE_MESSAGE_CONVERSATION: "receive_message_conversation",
   RECEIVE_MESSAGE_USER: "receive_message_user",
   ERROR: "error",
+  ADD_NEW_CONVERSATION: "add_new_conversation",
   JOIN_CONVERSATION: "join_conversation",
   LEAVE_CONVERSATION: "leave_conversation",
-  RETRY_CONVERSATION: "retry_conversation",
+  UPDATE_CONVERSATION: "update_conversation",
   ONLINE: "online",
   OFFLINE: "offline",
 };

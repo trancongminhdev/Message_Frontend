@@ -8,12 +8,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import { IMessage } from "@/types/interaface/message.interface";
 import { IResponseListData } from "@/types/interaface/api.interface";
 import { IConversation } from "@/types/interaface/conversation.interface";
+import QUERY_KEY from "@/types/constant/queryKey.constant";
 
 export const SocketProvider = () => {
   const { data } = useSession();
   const queryClient = useQueryClient();
   useEffect(() => {
     const token = data?.accessToken;
+
     if (!token) return;
 
     const socket = initSocket(token);
@@ -22,10 +24,9 @@ export const SocketProvider = () => {
       JoinConversation(Number(data?.user.id));
     });
 
-    socket.on(SOCKET_EVENT.RECEIVE_MESSAGE_USER, (message: IMessage) => {
-      console.log("message 123 12312", message);
+    socket.on(SOCKET_EVENT.UPDATE_CONVERSATION, (message: IMessage) => {
       queryClient.setQueryData(
-        ["conversations"],
+        [QUERY_KEY.LIST_CONVERSATIONS],
         (oldData: IResponseListData<IConversation>) => {
           if (!oldData?.data?.items) return oldData;
 
