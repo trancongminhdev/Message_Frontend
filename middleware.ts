@@ -7,7 +7,7 @@ import { ROUTE } from "./types/constant/route";
 export async function middleware(req: NextRequest) {
   const token = await getToken({ req });
   const isLoggedIn = !!token;
-
+  
   // Lấy full URL hiện tại
   const currentUrl = req.nextUrl.href;
   const pathname = req.nextUrl.pathname;

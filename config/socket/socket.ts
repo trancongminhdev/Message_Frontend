@@ -1,4 +1,6 @@
 import { io, Socket } from "socket.io-client";
+import { SOCKET_EVENT } from "./type.socket";
+import { IConversation } from "@/types/interaface/conversation.interface";
 
 let socket: Socket | null = null;
 
@@ -36,4 +38,10 @@ export const disconnectSocket = () => {
   if (socket) {
     socket.disconnect();
   }
+};
+
+export const SocketNavigation = (callback: (conversation:IConversation) => void) => {
+  const socket = getSocket();
+
+  socket.on(SOCKET_EVENT.SOCKET_NAVIGATION, callback);
 };

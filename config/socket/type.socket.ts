@@ -11,4 +11,5 @@ export const SOCKET_EVENT = {
   UPDATE_CONVERSATION: "update_conversation",
   ONLINE: "online",
   OFFLINE: "offline",
+  SOCKET_NAVIGATION: "socket_navigation",
 };

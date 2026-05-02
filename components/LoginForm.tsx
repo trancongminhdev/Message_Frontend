@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { useState } from 'react';
+// import { Button } from '@/components/ui/button';
+// import { Input } from '@/components/ui/input';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import AppButton from './button/AppButton';
+import AppInputFormik from './input/AppInputFormik';
 
 export function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
@@ -25,7 +27,7 @@ export function LoginForm() {
             {/* Header */}
             <div className="space-y-3 text-center">
                 <div className="flex items-center justify-center mb-4">
-                    <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600">
+                    <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-linear-to-br from-blue-500 to-blue-600">
                         <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                         </svg>
@@ -48,7 +50,7 @@ export function LoginForm() {
                     </label>
                     <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                        <Input
+                        <AppInputFormik
                             id="email"
                             type="email"
                             placeholder="example@gmail.com"
@@ -75,7 +77,7 @@ export function LoginForm() {
                     </div>
                     <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                        <Input
+                        <AppInputFormik
                             id="password"
                             type={showPassword ? 'text' : 'password'}
                             placeholder="Nhập mật khẩu của bạn"
@@ -111,7 +113,7 @@ export function LoginForm() {
                 </div>
 
                 {/* Submit Button */}
-                <Button
+                <AppButton
                     type="submit"
                     disabled={isLoading}
                     className="w-full h-11 bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-colors mt-2"
@@ -124,7 +126,7 @@ export function LoginForm() {
                     ) : (
                         'Đăng nhập'
                     )}
-                </Button>
+                </AppButton>
             </form>
 
             {/* Divider */}
