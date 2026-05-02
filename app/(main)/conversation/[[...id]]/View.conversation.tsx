@@ -2,19 +2,15 @@
 
 import ChatArea from "@/components/chat-area";
 import UserOptionsMenu from "@/components/user-options-menu";
-import { SendMessage } from "@/config/socket/chat.socket";
-import {
-  JoinConversation,
-  LeaveConversation,
-  UpdateConversation,
-} from "@/config/socket/conversation.socket";
-import { getSocket, SocketOff } from "@/config/socket/socket";
+import { getSocket } from "@/config/socket/socket";
 import { SOCKET_EVENT } from "@/config/socket/type.socket";
 import { IMAGE_SOUCE } from "@/public/assets/images";
 import { conversationService } from "@/service/convertasion.service";
 import { messageService } from "@/service/message.service";
 import { userService } from "@/service/user.service";
 import QUERY_KEY from "@/types/constant/queryKey.constant";
+import { IResponseListData } from "@/types/interaface/api.interface";
+import { IConversation } from "@/types/interaface/conversation.interface";
 import { IMessage } from "@/types/interaface/message.interface";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, MoreVertical, Phone, Send, Video } from "lucide-react";
@@ -59,7 +55,13 @@ const ConversationUserChat: React.FC<Props> = ({ ids }) => {
   });
 
   const buttonSendMessage = useCallback((message: string) => {
-    SendMessage({ idReceiver: Number(ids[0]), message });
+    const socket = getSocket();
+
+    socket.emit(SOCKET_EVENT.SEND_MESSAGE, {
+      idReceiver: Number(ids[0]),
+      message,
+    });
+
     setInputMessage("");
   }, []);
 
@@ -71,27 +73,49 @@ const ConversationUserChat: React.FC<Props> = ({ ids }) => {
   useEffect(() => {
     const socket = getSocket();
 
+    const receiverMessageConversation = (message: IMessage) => {
+      setMessage((prev) => [...prev, message]);
+    };
+
+    //update conversation
+    const updateConversation = (conversation: IConversation) => {
+      queryClient.setQueryData(
+        [QUERY_KEY.LIST_CONVERSATIONS],
+        (oldData: IResponseListData<IConversation>) => {
+          if (!oldData.data?.items) return oldData;
+          return {
+            ...oldData,
+            data: {
+              ...oldData.data,
+              items: [conversation, ...oldData.data.items],
+            },
+          };
+        },
+      );
+    };
+
+    const joinConversation = () => {
+      socket?.emit(SOCKET_EVENT.JOIN_CONVERSATION, ids[1]);
+    };
+
+    joinConversation();
+
+    socket.on(SOCKET_EVENT.CONNECT, joinConversation);
+
+    //on
+    socket.on(SOCKET_EVENT.UPDATE_CONVERSATION, updateConversation);
     socket.on(
       SOCKET_EVENT.RECEIVE_MESSAGE_CONVERSATION,
-      (message: IMessage) => {
-        setMessage((prev) => [...prev, message]);
-      },
+      receiverMessageConversation,
     );
 
-    socket.on(SOCKET_EVENT.CONNECT, () => {
-      UpdateConversation(queryClient);
-    });
-
-    socket.on(SOCKET_EVENT.CONNECT, () => {
-      JoinConversation(Number(ids[1]));
-    });
-
-    JoinConversation(Number(ids[1]));
-
     return () => {
-      SocketOff(SOCKET_EVENT.CONNECT);
-      SocketOff(SOCKET_EVENT.RECEIVE_MESSAGE_CONVERSATION);
-      LeaveConversation(Number(ids[1]));
+      socket.off(
+        SOCKET_EVENT.RECEIVE_MESSAGE_CONVERSATION,
+        receiverMessageConversation,
+      );
+      socket.off(SOCKET_EVENT.CONNECT, joinConversation);
+      socket.off(SOCKET_EVENT.UPDATE_CONVERSATION, updateConversation);
     };
   }, [ids[1]]);
 
@@ -149,7 +173,7 @@ const ConversationUserChat: React.FC<Props> = ({ ids }) => {
               >
                 <MoreVertical className="w-5 h-5" />
               </button>
-              {showUserMenu && (
+              {showUserMenu && userReceiver?.data && (
                 <UserOptionsMenu
                   user={userReceiver?.data}
                   onClose={() => setShowUserMenu(false)}

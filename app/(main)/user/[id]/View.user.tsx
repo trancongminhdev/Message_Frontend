@@ -2,9 +2,11 @@
 
 import ChatArea from "@/components/chat-area";
 import UserOptionsMenu from "@/components/user-options-menu";
-import { ReceiveMessageUser, SendMessage } from "@/config/socket/chat.socket";
-import { AddNewConversation } from "@/config/socket/conversation.socket";
-import { getSocket, SocketOff } from "@/config/socket/socket";
+import { SendMessage } from "@/config/socket/chat.socket";
+import {
+  getSocket,
+  SocketOff
+} from "@/config/socket/socket";
 import { SOCKET_EVENT } from "@/config/socket/type.socket";
 import { IMAGE_SOUCE } from "@/public/assets/images";
 import { userService } from "@/service/user.service";
@@ -26,7 +28,6 @@ interface Props {
 const ViewUserChat: React.FC<Props> = ({ idReceiver }) => {
   const navigation = useRouter();
   const { data } = useSession();
-  const queryClient = useQueryClient();
 
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [message, setMessage] = useState<IMessage[]>([]);
@@ -47,24 +48,24 @@ const ViewUserChat: React.FC<Props> = ({ idReceiver }) => {
   useEffect(() => {
     const socket = getSocket();
 
-    socket.on(SOCKET_EVENT.CONNECT, () => {
-      ReceiveMessageUser((message: IMessage) => {
-        setMessage((prev) => [...prev, message]);
-      });
-    });
+    //Nhận tin nhắn
+    const receiverMessage = (message: IMessage) => {
+      setMessage((prev) => [...prev, message]);
+    };
 
-    socket.on(SOCKET_EVENT.CONNECT, () => {
-      AddNewConversation(queryClient, (coversation: IConversation) => {
-        if (!coversation.id) return;
-        const route = ROUTE.CONVERSATION(idReceiver, coversation.id.toString());
-        navigation.push(route);
-      });
-    });
+    //chuyển hướng sang conversation
+    const socketNavagation = (conversation: IConversation) => {
+      if (!conversation.id) return;
+      const route = ROUTE.CONVERSATION(idReceiver, conversation.id.toString());
+      navigation.push(route);
+    };
+
+    socket.on(SOCKET_EVENT.RECEIVE_MESSAGE_USER, receiverMessage);
+    socket.on(SOCKET_EVENT.SOCKET_NAVIGATION, socketNavagation);
 
     return () => {
-      SocketOff(SOCKET_EVENT.RECEIVE_MESSAGE_USER);
-      SocketOff(SOCKET_EVENT.ADD_NEW_CONVERSATION);
-      SocketOff(SOCKET_EVENT.UPDATE_CONVERSATION);
+      socket.off(SOCKET_EVENT.RECEIVE_MESSAGE_USER, receiverMessage);
+      socket.off(SOCKET_EVENT.SOCKET_NAVIGATION, socketNavagation);
     };
   }, []);
 
@@ -110,7 +111,7 @@ const ViewUserChat: React.FC<Props> = ({ idReceiver }) => {
               >
                 <MoreVertical className="w-5 h-5" />
               </button>
-              {showUserMenu && (
+              {showUserMenu && userReceiver?.data && (
                 <UserOptionsMenu
                   user={userReceiver?.data}
                   onClose={() => setShowUserMenu(false)}

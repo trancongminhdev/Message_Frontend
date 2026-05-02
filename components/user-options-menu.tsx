@@ -5,18 +5,19 @@ import { UserPlus, UserX, Search } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ROUTE } from "@/types/constant/route";
+import { IUser } from "@/types/interaface/user.interface";
 
-export default function UserOptionsMenu({ user, onClose }) {
+export default function UserOptionsMenu({ user, onClose }: {user:IUser, onClose: () => void}) {
   const navigation = useRouter();
-  const [isFriend, setIsFriend] = useState(user.isFriend);
+  // const [isFriend, setIsFriend] = useState(user.isFriend);
 
   const handleAddFriend = () => {
-    setIsFriend(true);
+    // setIsFriend(true);
     onClose();
   };
 
   const handleRemoveFriend = () => {
-    setIsFriend(false);
+    // setIsFriend(false);
     onClose();
   };
 
@@ -30,7 +31,7 @@ export default function UserOptionsMenu({ user, onClose }) {
         </button>
 
         {/* Add/Remove Friend */}
-        {isFriend ? (
+        {/* {isFriend ? (
           <button
             onClick={handleRemoveFriend}
             className="w-full px-4 py-2 text-left text-sm text-destructive hover:bg-secondary transition flex items-center gap-2 border-t border-border"
@@ -38,7 +39,7 @@ export default function UserOptionsMenu({ user, onClose }) {
             <UserX className="w-4 h-4" />
             Unfriend
           </button>
-        ) : (
+        ) : ( */}
           <button
             onClick={handleAddFriend}
             className="w-full px-4 py-2 text-left text-sm text-primary hover:bg-secondary transition flex items-center gap-2 border-t border-border"
@@ -46,7 +47,7 @@ export default function UserOptionsMenu({ user, onClose }) {
             <UserPlus className="w-4 h-4" />
             Add friend
           </button>
-        )}
+        {/* )} */}
 
         {/* View Profile */}
         <button className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-secondary transition border-t border-border">

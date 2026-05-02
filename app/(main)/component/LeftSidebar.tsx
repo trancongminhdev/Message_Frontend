@@ -4,14 +4,13 @@ import AppImage from "@/components/image/AppImage";
 import InputSearch from "@/components/input/InputSearch";
 import ModalSearchUser from "@/components/modal/ModalSearchUser";
 import UserList from "@/components/user-list";
-import { AddNewConversation, UpdateConversation } from "@/config/socket/conversation.socket";
-import { getSocket, SocketOff } from "@/config/socket/socket";
+import { getSocket } from "@/config/socket/socket";
 import { SOCKET_EVENT } from "@/config/socket/type.socket";
 import { IMAGE_SOUCE } from "@/public/assets/images";
 import { conversationService } from "@/service/convertasion.service";
 import { messageService } from "@/service/message.service";
 import QUERY_KEY from "@/types/constant/queryKey.constant";
-import { ROUTE } from "@/types/constant/route";
+import { IResponseListData } from "@/types/interaface/api.interface";
 import { IConversation } from "@/types/interaface/conversation.interface";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
@@ -52,19 +51,48 @@ const LeftSidebar = () => {
   useEffect(() => {
     const socket = getSocket();
 
-    socket.on(SOCKET_EVENT.CONNECT, () => {
-      AddNewConversation(queryClient);
-    });
+    //add new conversation
+    const addNewConversation = (conversation: IConversation) => {
+      queryClient.setQueryData(
+        [QUERY_KEY.LIST_CONVERSATIONS],
+        (oldData: IResponseListData<IConversation>) => {
+          if (!oldData.data?.items) return oldData;
 
-    socket.on(SOCKET_EVENT.CONNECT, () => {
-      console.log("UpdateConversation");
-      
-      UpdateConversation(queryClient);
-    });
-    
+          const newData = {
+            ...oldData,
+            data: {
+              ...oldData.data,
+              items: [conversation, ...oldData.data.items],
+            },
+          };
+          return newData;
+        },
+      );
+    };
+
+    //update conversation
+    const updateConversation = (conversation: IConversation) => {
+        queryClient.setQueryData(
+          [QUERY_KEY.LIST_CONVERSATIONS],
+          (oldData: IResponseListData<IConversation>) => {
+            if (!oldData.data?.items) return oldData;
+            return {
+              ...oldData,
+              data: {
+                ...oldData.data,
+                items: [conversation, ...oldData.data.items],
+              },
+            };
+          },
+        );
+      }
+
+    socket.on(SOCKET_EVENT.ADD_NEW_CONVERSATION, addNewConversation);
+    socket.on(SOCKET_EVENT.UPDATE_CONVERSATION, updateConversation);
+
     return () => {
-      SocketOff(SOCKET_EVENT.ADD_NEW_CONVERSATION);
-      SocketOff(SOCKET_EVENT.UPDATE_CONVERSATION);
+      socket.off(SOCKET_EVENT.ADD_NEW_CONVERSATION, addNewConversation);
+      socket.off(SOCKET_EVENT.UPDATE_CONVERSATION, updateConversation);
     };
   }, []);
 
